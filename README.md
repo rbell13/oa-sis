@@ -1,2 +1,4 @@
 # oa-sis
-Open Api (formerlly Swagger) spec library service for your service repos. 
+OpenApi Service Information Stash
+
+Open Api (formerlly Swagger) spec library service for your service repos.

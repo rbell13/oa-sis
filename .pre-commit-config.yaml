@@ -1,0 +1,39 @@
+---
+repos:
+- repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
+  rev: 0.1.0
+  hooks:
+  - id: yamlfmt
+    args: [--mapping, '2', --sequence, '2', --offset, '0']
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.0.1
+  hooks:
+  - id: trailing-whitespace
+  - id: check-yaml
+  - id: check-json
+  - id: end-of-file-fixer
+    exclude: \.csv$
+- repo: https://github.com/APIDevTools/swagger-cli
+  rev: v4.0.4
+  hooks:
+  - id: swagger-validation
+    files: .*(oas-).*\.(json|yaml)$
+    args: [validate, -v]
+    # GOLANG HOOKS
+- repo: https://github.com/dnephin/pre-commit-golang
+  rev: v0.4.0
+  hooks:
+  - id: go-fmt
+  - id: go-imports
+  - id: go-mod-tidy
+  - id: validate-toml
+- repo: https://github.com/golangci/golangci-lint
+  rev: v1.43.0
+  hooks:
+  - id: golangci-lint
+    name: golangci-lint
+    description: Fast linters runner for Go.
+    entry: golangci-lint run --fix
+    types: [go]
+    language: golang
+    pass_filenames: false

@@ -1,0 +1,114 @@
+openapi: 3.0.3
+
+info:
+  title: OAsis Spec Server
+  description: a service to collect and read OpenApi Specs
+  # termsOfService:
+  contact:
+    name: Roland Bell
+    url: https://www.github.com/rbell13
+    email: rbell13@gmu.edu
+  license:
+    name: GNU GPLv3
+    url: https://choosealicense.com/licenses/gpl-3.0/
+  version: 0.0.1
+
+# servers: later
+
+paths:
+  /index:
+    get:
+      tags: [UI]
+      description: gets directory of swagger specs
+      responses:
+        '200':
+          $ref: '#/components/responses/404'
+        '404':
+          $ref: '#/components/responses/404'
+
+  /json/{spec}:
+    get:
+      tags: [JSON]
+      description: gets json swagger spec for the given application
+      parameters:
+        - $ref: '#/components/parameters/spec'
+      responses:
+        '200':
+          $ref: '#/components/responses/JsonSpecResponse'
+        '404':
+          $ref: '#/components/responses/404'
+
+  /yaml/{spec}:
+    get:
+      tags: [YAML]
+      description: gets yaml swagger spec for the given application
+      parameters:
+        - $ref: '#/components/parameters/spec'
+      responses:
+        '200':
+          $ref: '#/components/responses/YamlSpecResponse'
+        '404':
+          $ref: '#/components/responses/404'
+
+components:
+  schemas:
+    #########
+    # ERROR #
+    #########
+    YamlSpec:
+      type: string
+    Error:
+      type: string
+    JsonSpec:
+      type: object
+      required:
+      - openapi
+      - info
+      properties:
+        openapi:
+          type: string
+        info:
+          type: object
+          required:
+          - title
+          - version
+          properties:
+            title:
+              type: string
+            version:
+              type: string
+            additionalProperties:
+              type: object
+        paths:
+          type: object
+          additionalProperties:
+            type: object
+        additionalProperties:
+          type: object
+  parameters:
+    spec:
+      name: spec
+      in: path
+      description: the name of the contact to query
+      required: true
+      schema:
+        type: string
+  responses:
+    JsonSpecResponse:
+      description: json spec response
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/JsonSpec'
+    YamlSpecResponse:
+      description: yaml spec response
+      content:
+        'text/plain':
+          schema:
+            $ref: '#/components/schemas/YamlSpec'
+    404:
+      description: not found
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
