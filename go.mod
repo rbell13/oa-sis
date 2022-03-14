@@ -3,6 +3,8 @@ module github.com/rbell13/oa-sis
 go 1.17
 
 require (
+	github.com/Masterminds/vcs v1.13.1 // indirect
+	github.com/davecgh/go-spew v1.1.1
 	github.com/deepmap/oapi-codegen v1.9.1 // indirect
 	github.com/getkin/kin-openapi v0.92.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
