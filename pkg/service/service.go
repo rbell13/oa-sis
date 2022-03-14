@@ -15,20 +15,19 @@ import (
 )
 
 const (
-	REPOS_ENV = "REPOS"
-	FORMAT_ENV = "FORMAT"
+	REPOS_ENV      = "REPOS"
+	FORMAT_ENV     = "FORMAT"
 	FORMAT_DEFAULT = ".*-oas.yaml"
 )
 
 type OAsisService struct {
-	repos []string
+	repos        []string
 	formatString string
-
 }
 
 func NewOAsisService() (oas *OAsisService) {
 	var (
-		format string
+		format    string
 		reposList string
 	)
 
@@ -41,18 +40,18 @@ func NewOAsisService() (oas *OAsisService) {
 	}
 
 	oas = &OAsisService{
-		repos: strings.Split(reposList, ","),
+		repos:        strings.Split(reposList, ","),
 		formatString: format,
 	}
 
-	go func () {
+	go func() {
 		for _, repo := range oas.repos {
 			oas.updateRepo(repo, oas.formatString)
 			time.Sleep(5)
 		}
 	}()
-	
-	return 
+
+	return
 }
 
 // (GET /index)
@@ -72,24 +71,24 @@ func (oasis *OAsisService) GetYamlSpec(ctx echoV4.Context, spec OAsis.Spec) erro
 }
 
 // updateRepo scans a github repository for filenames that match a given format string and returns a list of filenames
-func (oasis *OAsisService) updateRepo(repo, format string) (files string, err error){
+func (oasis *OAsisService) updateRepo(repo, format string) (files string, err error) {
 	svn, err := vcs.NewSvnRepo(repo, "")
-	if err != nil{
+	if err != nil {
 		return
 	}
 
-	if !svn.Ping(){
+	if !svn.Ping() {
 		err = errors.New("repo not found")
-		return 
+		return
 	}
 
 	lsBytes, err := svn.RunFromDir("svn", "ls", "--verbose", "--recursive", "--depth=infinity", ".")
-	if err != nil{
+	if err != nil {
 		return
 	}
 
 	files = string(lsBytes)
 	spew.Dump(files)
 
-	return 
+	return
 }
