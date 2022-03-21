@@ -4,10 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"os"
+	"os/exec"
+	"io"
+	"io/ioutil"
 	"regexp"
 	"strings"
 	"time"
@@ -71,17 +73,17 @@ func NewOAsisService() (oas *OAsisService) {
 
 // (GET /index).
 func (oasis *OAsisService) GetIndex(ctx echoV4.Context) error {
-	return echoV4.NewHTTPError(http.StatusNotImplemented)
+	return ctx.File("./temporary/index.html")
 }
 
 // (GET /json/{spec}).
 func (oasis *OAsisService) GetJsonSpec(ctx echoV4.Context, spec OAsis.Spec) error {
-	return echoV4.NewHTTPError(http.StatusNotImplemented)
+	return ctx.File("./temporary/" + string(spec) + ".json")
 }
 
 // (GET /yaml/{spec}).
 func (oasis *OAsisService) GetYamlSpec(ctx echoV4.Context, spec OAsis.Spec) error {
-	return ctx.File("/tmp/" + string(spec) + ".yaml")
+	return ctx.File("./temporary/" + string(spec) + ".yaml")
 }
 
 // updateRepo scans a github repository for filenames that match a given format string and returns a list of filenames.
@@ -130,14 +132,14 @@ func getOASFromRemote(ctx context.Context, repo string, files []string) {
 		}
 		defer resp.Body.Close()
 
-		err = os.Mkdir("/tmp", os.ModeDir)
+		err = os.Mkdir("./temporary", 0777)
 		if err != nil {
 			spew.Dump(err)
 
 			continue
 		}
 
-		localfile, err := os.Create("/tmp/" + strings.ReplaceAll(file, "trunk/pkg/", ""))
+		localfile, err := os.Create("./temporary/" + strings.ReplaceAll(file, "trunk/pkg/", ""))
 		if err != nil {
 			spew.Dump(err)
 		}
@@ -149,5 +151,35 @@ func getOASFromRemote(ctx context.Context, repo string, files []string) {
 		}
 
 		spew.Dump(size)
+
+		// create json version of spec
+		byte, err := exec.Command("openapi-generator-cli", "generate", "-i", "./temporary/"+strings.ReplaceAll(file, "trunk/pkg/", ""), "-g", "openapi", "-o", "./temporary/").CombinedOutput()
+		if err != nil {
+			spew.Dump(byte)
+			spew.Dump(err)
+		}
+
+		//generate dynamic-html documentation for spec
+		err = exec.Command("openapi-generator-cli", "generate", "-i", "./temporary/"+strings.ReplaceAll(file, "trunk/pkg/", ""), "-g", "html2", "-o", "./temporary/").Run()
+		if err != nil {
+			spew.Dump(byte)
+			spew.Dump(err)
+		}
+
+		//generate swagger-ui documentation for spec
+		err = exec.Command("openapi-generator-cli", "generate", "-i", "./temporary/"+strings.ReplaceAll(file, "trunk/pkg/", ""), "-g", "swagger-ui", "-o", "./temporary/").Run()
+		if err != nil {
+			spew.Dump(byte)
+			spew.Dump(err)
+		}
+
+		files, err := ioutil.ReadDir("./temporary")
+		if err != nil {
+			spew.Dump(err)
+		}
+	
+		for _, file := range files {
+			fmt.Println(file.Name(), file.IsDir())
+		}
 	}
 }
