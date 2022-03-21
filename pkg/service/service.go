@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
 	"os/exec"
-	"io"
-	"io/ioutil"
 	"regexp"
 	"strings"
 	"time"
@@ -64,7 +64,7 @@ func NewOAsisService() (oas *OAsisService) {
 
 			getOASFromRemote(context.Background(), repo, oas.oasFiles)
 		}
-		
+
 		time.Sleep(time.Second * REFRESH_SECONDS)
 	}()
 
@@ -132,7 +132,7 @@ func getOASFromRemote(ctx context.Context, repo string, files []string) {
 		}
 		defer resp.Body.Close()
 
-		err = os.Mkdir("./temporary", 0777)
+		err = os.Mkdir("./temporary", 0o777)
 		if err != nil {
 			spew.Dump(err)
 
@@ -159,14 +159,14 @@ func getOASFromRemote(ctx context.Context, repo string, files []string) {
 			spew.Dump(err)
 		}
 
-		//generate dynamic-html documentation for spec
+		// generate dynamic-html documentation for spec
 		err = exec.Command("openapi-generator-cli", "generate", "-i", "./temporary/"+strings.ReplaceAll(file, "trunk/pkg/", ""), "-g", "html2", "-o", "./temporary/").Run()
 		if err != nil {
 			spew.Dump(byte)
 			spew.Dump(err)
 		}
 
-		//generate swagger-ui documentation for spec
+		// generate swagger-ui documentation for spec
 		err = exec.Command("openapi-generator-cli", "generate", "-i", "./temporary/"+strings.ReplaceAll(file, "trunk/pkg/", ""), "-g", "swagger-ui", "-o", "./temporary/").Run()
 		if err != nil {
 			spew.Dump(byte)
@@ -177,7 +177,7 @@ func getOASFromRemote(ctx context.Context, repo string, files []string) {
 		if err != nil {
 			spew.Dump(err)
 		}
-	
+
 		for _, file := range files {
 			fmt.Println(file.Name(), file.IsDir())
 		}
