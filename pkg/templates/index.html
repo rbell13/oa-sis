@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.css">
+    <title>OA-SIS</title>
+</head>
+
+<body>
+    <h1>Hello World</h1>
+    <p>Welcome to OA-SIS, the
+    <p>The source code for this project is available at <a href=""> </a></p>
+    <p>
+        <img src="https://img.shields.io/static/v1?logo=go&label=version&logoColor=00ADD8&message={{.GoVersion}}&color=00ADD8" alt="Go Version">
+        <img src="https://img.shields.io/static/v1?label=Build%20Date&message={{.BuildDate}}&color=brightgreen" alt="Build Date">
+    </p>
+
+    <div>
+        <h2>Available Specs: </h2>
+        {{range .Specs}}
+        <div>
+            <a href="/swag/{{.}}"><button>{{.}}</button></a>
+        </div>
+        {{end}}
+    </div>
+
+</body>
+
+</html>

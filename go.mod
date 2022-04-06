@@ -6,6 +6,7 @@ require (
 	github.com/Masterminds/vcs v1.13.1
 	github.com/davecgh/go-spew v1.1.1
 	github.com/deepmap/oapi-codegen v1.9.1
+	github.com/foolin/goview v0.3.0
 	github.com/getkin/kin-openapi v0.92.0
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
